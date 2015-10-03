@@ -14,12 +14,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+//other
+#include <string>
+
 class Fish {
 
 	public:
 		// load / unload model from memory
 		static void InitModel();
 		static void DestroyModel();
+		static std::string readFile(const char* filePath);
 
 		//variables
 		glm::mat4 model; //transform for the fish
@@ -32,8 +36,10 @@ class Fish {
 
 	private:
 		//shaders
+		/*
 		static const GLchar* vertexSource;
 		static const GLchar* fragmentSource;
+		*/
 
 		//gl stuff
 		static GLuint vao;

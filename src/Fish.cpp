@@ -4,35 +4,7 @@
 #include "globals.h"
 
 #include <iostream>
-
-// Shader sources
-const GLchar* Fish::vertexSource =
-	"#version 150\n"
-	"in vec3 position;"
-	"in vec3 normal;"
-	"uniform mat4 proj;"
-	"uniform mat4 view;"
-	"uniform mat4 model;"
-	"uniform float animationOffset;"
-	"out vec3 color;"
-	"void main()" 
-	"{"
-	"	vec3 lightV = normalize(vec3(1,-1,0));"
-	"	vec3 mvNorm = vec3(model * vec4(normal, 0));"
-	"	float diffuse = max(dot(mvNorm, lightV), 0.3);"
-	"	vec3 startColor = vec3(1.0, 0.5, 0.0);"
-	"	color = startColor * diffuse;"
-	"	vec3 newPos = position + vec3(0, 0, (sin((animationOffset + position.x) * 4) / 16));"
-	"	gl_Position = proj * view * model * vec4(newPos, 1.0);"
-	"}";
-
-const GLchar* Fish::fragmentSource =
-    "#version 150\n"
-    "in vec3 color;"
-    "out vec4 outColor;"
-    "void main() {"
-    "   outColor = vec4(color, 1.0);"
-    "}";
+#include <fstream>
 
 //this feels like a weird hack, but all these variables need to be instantiated
 GLuint Fish::vao = 0;
@@ -45,6 +17,26 @@ GLint Fish::uniProj = 0;
 GLint Fish::uniView = 0;
 GLint Fish::uniModel = 0;
 GLint Fish::uniAnim = 0;
+
+//move this somewhere else sometime
+std::string Fish::readFile(const char* filePath) {
+    std::string content;
+    std::ifstream fileStream(filePath, std::ios::in);
+
+    if(!fileStream.is_open()) {
+        std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl;
+        return "";
+    }
+
+    std::string line = "";
+    while(!fileStream.eof()) {
+        std::getline(fileStream, line);
+        content.append(line + "\n");
+    }
+
+    fileStream.close();
+    return content;
+}
 
 void Fish::InitModel() {
 
@@ -174,14 +166,20 @@ void Fish::InitModel() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-	//vertex shader
+	//load shader source from file
+	std::string vertexShaderStr = readFile("vertex_shader.vert");
+	const char* vertexShaderSrc = vertexShaderStr.c_str();
+	//make vertex shader
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, (const GLchar**) &vertexSource, NULL);
+	glShaderSource(vertexShader, 1, &vertexShaderSrc, NULL);
 	glCompileShader(vertexShader);
 
-	//fragment shader
+	//load shader source from file
+	std::string fragmentShaderStr = readFile("fragment_shader.frag");
+	const char* fragmentShaderSrc = fragmentShaderStr.c_str();
+	//make fragment shader
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, (const GLchar**) &fragmentSource, NULL);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
 	glCompileShader(fragmentShader);
 
 	//make shader program

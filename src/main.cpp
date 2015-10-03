@@ -28,14 +28,13 @@ SDL_Window* window;
 SDL_GLContext context;
 std::chrono::time_point<std::chrono::high_resolution_clock> t_start;
 std::chrono::time_point<std::chrono::high_resolution_clock> t_then;
-GLint uniModel;
-GLint uniAnim;
 
-//global variables
-Camera camera = Camera();
 Fish fish(glm::vec3(0, 1, 0), 45.0, 2.0);
 Fish fish2(glm::vec3(-0.5, -0.5, 1), -90.0, 1.0);
 Fish fish3(glm::vec3(-3, -6, -2), 180.0, 3.0);
+
+//global variables
+Camera camera = Camera();
 
 void init() {
 	//start SDL with video module	
